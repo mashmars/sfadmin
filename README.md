@@ -1,2 +1,2 @@
 # sfadmin
-### sfadmin中台， 搭配goapi使用
+### sfadmin后台， 搭配goapi使用
