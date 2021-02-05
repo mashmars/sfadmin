@@ -1,0 +1,96 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block main %}
+ <!-- content -->
+<div class="grid-x padding-1 shadow">
+    <div class="cell">
+        <a class="button hollow primary small" href="{{ path('admin.user.add') }}">
+            <i class="fas fa-plus"></i>
+        添加</a>
+        <a class="button info small float-right search">搜索</a>
+        <!-- search -->   
+        <div id="search" class="clearfix">
+            <form action="" method="get" id="form-search">
+                <div class="grid-x grid-padding-x">                                       
+                    <div class="large-1 small-3 cell">
+                        <label for="" class="text-right middle">编号:</label>
+                    </div>
+                    <div class="large-2 small-9 cell">
+                        <input type="text" id="" name="" placeholder="" value="">
+                    </div> 
+                    <div class="large-1 small-3 cell">
+                        <label for="" class="text-right middle">下拉框:</label>
+                    </div>
+                    <div class="large-2 small-9 cell">
+                        <select name="" id="">
+                            <option value="">全部</option>                                                    
+                        </select>
+                    </div> 
+                    <div class="large-1 small-3 cell">
+                        <label for="" class="text-right middle">输入框:</label>
+                    </div>
+                    <div class="large-1 small-9 cell">
+                        <input type="text" id="" name="" placeholder="年份" value="">
+                    </div>                                            
+                    <div class="large-2 small-12 cell">
+                        <button type="button" class="button alert  hollow  margin-bottom-0 padding-tb" id="button-search"><i class="fas fa-search"></i> 查询</button>
+                    </div>                                                                        
+                </div>                        
+            </form>
+        </div>
+        <!-- search end -->   
+        <hr>                                
+        {% for label, messages in app.flashes %}
+        {% for message in messages %}
+        <div class="{{ label }} callout" data-closable> 
+            <button class="close-button" aria-label="alert" type="button" data-close>
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <p>{{ message }}</p> 
+        </div> 
+        {% endfor %}
+        {% endfor %}
+        <!-- table style 1 -->
+        <div class="table-scroll">
+            <table class="hover border gray">
+                <thead>
+                    <tr>
+                        <th class="text-center">ID</th>                                                                                
+                        <th class="text-center">用户名</th>   
+                        <th class="text-center">角色</th> 
+                        <th class="text-center">描述</th> 
+                        <th class="text-center">操作</th>
+                    </tr>
+                </thead>
+                <tbody> 
+                    {% for v in pagination %}                                  
+                    <tr class="text-center">
+                        <td>{{ v.id }}</td>                                       
+                        <td>{{ v.username }}</td>                                                                                       
+                        <td>{{ v.role ? v.role.name : '' }}</td>       
+                        <td>{{ v.descript }}</td>                                 
+                        <td>
+                            <button class="hollow button small margin-bottom-0 padding-tb href-edit"  data-id="{{ v.id }}" data-href="{{ path('admin.user.edit', {'id':v.id}) }}">
+                                <i class="fas fa-edit"></i>
+                            编辑</button>
+                           
+                            <button class="hollow button small alert margin-bottom-0 padding-tb ajax-delete" data-id="{{ v.id }}" data-href="{{ path('admin.user.delete') }}">
+                                <i class="far fa-trash-alt"></i>
+                                删除</button>
+                            
+                        </td>
+                    </tr>    
+                    {% endfor %}                                 
+                </tbody>
+            </table>
+        </div>
+        <!-- table style 1 end -->                                                            
+    </div>
+</div>
+<!-- pagination -->
+<div class="grid-x margin-top-2 align-center">
+    {% if pagination %}{{ knp_pagination_render(pagination) }}{% endif %}
+</div>
+<!-- pagination end -->
+<!-- content end -->
+{% endblock %}
