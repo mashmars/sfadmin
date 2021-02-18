@@ -55,7 +55,7 @@
                             </li>
                            
                             <li>
-                                <a href="javascript:void(0);" class="modify-password"><i class="fi fi-key"></i>修改密码</a>
+                                <a href="javascript:void(0);" class="modify-password" data-href="{{ path('admin.admin.password') }}"><i class="fi fi-key"></i>修改密码</a>
                             </li>
                           
                             <li>
@@ -91,7 +91,7 @@
                             </li>
                            
                             <li>
-                                <a href="javascript:void(0);" class="modify-password" data-href=""><i class="fi fi-key"></i> 修改密码</a>
+                                <a href="javascript:void(0);" class="modify-password" data-href="{{ path('admin.admin.password') }}"><i class="fi fi-key"></i> 修改密码</a>
                             </li>
                            
                             <li>
@@ -114,8 +114,8 @@
                                  <li>
                                     <a href="#" class="parent"><i class="fas fa-users-cog"></i>权限管理</a>
                                     <ul class="menu vertical nested">
-                                        <li><a href="" data-router="admin.user"><i class="fi fi-record"></i>管理员管理</a></li>                                    
-                                        <li><a href="" data-router="admin.role"><i class="fi fi-record"></i>角色管理</a></li>                                    
+                                        <li><a href="{{ path('admin.admin.index') }}" data-router="admin.admin"><i class="fi fi-record"></i>管理员管理</a></li>                                    
+                                        <li><a href="{{ path('admin.admin_role.index') }}" data-router="admin.admin_role"><i class="fi fi-record"></i>角色管理</a></li>                                    
                                         <li><a href="" data-router="admin.menu"><i class="fi fi-record"></i>菜单管理</a></li>                                    
                                         <li><a href="" data-router="admin.action"><i class="fi fi-record"></i>菜单功能管理</a></li>                                    
                                     </ul>
@@ -192,6 +192,7 @@
     <script src="{{ asset('static/js/vendor/foundation.js') }}"></script>
     <script src="{{ asset('static/admin/js/app.js') }}"></script>
     <script src="{{ asset('static/lib/layer/layer.js') }}"></script>  
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
     /***左侧菜单 当前链接 */
     $('.left-menu-large a').each(function(){
@@ -242,6 +243,17 @@
             },'json')
         })
     })
+    //
+    const baseURL = 'http://127.0.0.1:8080';
+    // 创建实例时设置配置的默认值
+    var axiosInstance = axios.create({
+        baseURL: baseURL,
+       
+    });
+
+    // 在实例已创建后修改默认值
+    axiosInstance.defaults.headers.common['Authorization'] = '';
+     axiosInstance.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
     </script> 
     {% endblock %}
     {% block extra %}{% endblock %}

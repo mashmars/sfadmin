@@ -65,7 +65,8 @@ $('a.ajax-shenhe,button.ajax-shenhe').on('click',function(){
         })        
     })
 })
-$('a.ajax-delete,button.ajax-delete').on('click',function(){    
+
+$('body').on('click', 'a.ajax-delete,button.ajax-delete', function(){
     var id = $(this).attr('data-id');
     var href = $(this).attr('data-href');
     var disabled = $(this).attr('disabled');
@@ -89,6 +90,24 @@ $('a.ajax-delete,button.ajax-delete').on('click',function(){
             layer.closeAll('loading');          
         })        
     })
+})
+
+//
+$('body').on('change', '.switch-input', function() {
+    let val = $(this).prop("checked") ? 1 : 0;
+    let href = $(this).attr("data-href");
+    let id = $(this).attr("data-id");
+    layer.load(2);
+    $.post(href,{id:id, status:val},function(data){
+        if(data.code == 0){
+            layer.msg(data.msg,{time:1000,icon:1},function(){
+                
+            })
+        }else{
+            layer.msg(data.msg,{time:2000,icon:5})
+        } 
+        layer.closeAll('loading');          
+    })  
 })
 
 /**layer open 打开iframe窗口 */

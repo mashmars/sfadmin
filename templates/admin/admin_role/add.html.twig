@@ -1,113 +1,68 @@
 {% extends 'admin/base.html.twig' %}
 
 {% block main %}
-<div class="grid-x  padding-1 shadow">
-    <div class="cell">
-        {% for label, messages in app.flashes %}
-        {% for message in messages %}
-        <div class="{{ label }} callout" data-closable> 
-            <button class="close-button" aria-label="alert" type="button" data-close>
-                <span aria-hidden="true">&times;</span>
-            </button>
-            <p>{{ message }}</p>   
-        </div>                      
-        {% endfor %}   
-        {% endfor %}   
-        <form action="{{ path('admin.role.add') }}" method="POST" id="form">
-            <div class="grid-x grid-margin-x">
-                <div class="cell">
-                    <label>角色名称
-                        <input type="text" name="name" id="name">
-                        <span class="form-error">错误信息</span>
-                    </label>
-                    <p class="help-text">帮助文件</p>
-                </div>
-                
-                 <div class="cell">
-                    <label>选择身份标识</lable>
-                    <select name="auth_role" id="auth_role">
-                    {% for authRole in auth_roles %}
-                    <option value="{{ authRole.id }}">{{ authRole.name }}</option>
-                    {% endfor %}
-                    </select>
-                </div>
-                
-                <div class="cell">
-                    <p>分配功能</p>
-                    <hr>
-                </div>
-                {% for menu in menus %}
-                <div class="cell">
-                    <div class="grid-x fieldset">
-                        <div class="cell large-2 large-offset-1">
-                            <div class="grid-x">
-                                <input type="checkbox" id="{{ menu.sign }}" name="menu[]" value="{{ menu.id }}" class="controller {{ menu.sign }}" data-action="{{ menu.sign }}"><label for="{{ menu.sign }}">{{ menu.name }}</label>
-                            </div>
+                    <div class="grid-x  padding-1 shadow">
+                        <div class="cell">
+                            {% for label, messages in app.flashes %}
+                            {% for message in messages %}
+                            <div class="{{ label }} callout" data-closable> 
+                                <button class="close-button" aria-label="alert" type="button" data-close>
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <p>{{ message }}</p>   
+                            </div>                      
+                            {% endfor %}   
+                            {% endfor %}  
                         </div>
-                        <div class="cell large-9">
-                            <div class="grid-x fieldset largin-up-6 medium-up-6 small-up-3">                                                    
-                                {% for action in menu.getAdminActions() %}
-                                {% if action.routerName ends with '.index' and loop.index != 1 %}<div class="width-100"><hr></div>{% endif %}    
-                                <div class="cell">
-                                    <input type="checkbox" id="{{ menu.sign }}-{{ loop.index }}" name="menu_action_{{ menu.sign }}[]" value="{{ action.id }}" class="action {{ menu.sign}}" data-action="{{ menu.sign }}"><label for="{{ menu.sign }}-{{ loop.index }}">{{ action.name }}</label>
+                        <div class="cell">                                                          
+                            <form id="form" method="post" novalidate="novalidate">
+                               <div>
+                                    <label for="name" class="required">角色名称</label>
+                                    <input type="text" id="name" name="name" required="required">
+                                </div>    
+                                <div>
+                                    <fieldset class="large-5 cell">
+                                        <legend>状态</legend>
+                                        <input type="radio" name="is_enabled" value="1" id="is_enabled_1" checked><label for="is_enabled_1">启用</label>
+                                        <input type="radio" name="is_enabled" value="0" id="is_enabled_0"><label for="is_enabled_0">禁用</label>
+                                    </fieldset>
+                                </div>                            
+                                <div>
+                                    <button type="button" id="submit" class="button small">提交</button>
                                 </div>
-                                {% endfor %}
-                            </div>                                               
+                            </form>
                         </div>
-                    </div>                                        
-                </div>
-                {% endfor %}
-                <div class="cell">
-                    <button class="button small" type="button" id="save">提交</button>
-                </div>
-            </div>                                
-        </form> 
-    </div>
-</div>
+                    </div>
 {% endblock %}
-{% block extra%}
+{% block extra %}
 <script>
-    $(function(){
-        //全选 or 全不选
-        $('.controller').click(function(){
-            var checked = $(this).prop('checked');
-            var action = $(this).attr('data-action');
-            if(checked){
-                $('.'+action).each(function(){
-                    $(this).prop('checked',true);
-                })
-            }else{
-                $('.'+action).each(function(){
-                    $(this).prop('checked',false);
-                })
-            }
-        })
-        //子项 有一个选中 则父也选中 如果都不选中 父也不选中
-        $('.action').click(function(){
-            var action = $(this).attr('data-action');
-            var checked = false;
-            $('.action.'+action).each(function(){
-                if($(this).prop('checked')){
-                    checked = true;
-                }
-            })
-            if(checked){
-                $('.controller.'+action).prop('checked',true);
-            }else{
-                $('.controller.'+action).prop('checked',false);
-            }
-        })
+    const adminRolesURL = baseURL + "/api/admin/role/all"
+    const addURL = baseURL + "/api/admin/role/add"
 
-        //
-        $('#save').click(function(){
-            var obj = $(this);
-            var name = $('#name').val();
-            if(name == ''){
-                layer.msg('角色名称不能为空',{time:2000,icon:5});
+    $(function() {  
+       
+        $('#submit').click(function() {
+            if ($('#name').val() == '') {
+                layer.msg('请先填写名称');
                 return false;
             }
-            obj.prop('disabled',true);
-            $('#form').submit();
+            
+            axiosInstance.post(addURL, $("#form").serialize())
+                .then((response) => {
+                    let data = response.data
+                    if (data.code == 1) {
+                        layer.msg(data.msg, {time:2000, icon:5}, function() {
+                            layer.closeAll()
+                        })                        
+                    } else {
+                        layer.msg(data.msg, {time:2000, icon:1}, function() {
+                            location.reload()
+                        }) 
+                    }
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
         })
     })
 </script>

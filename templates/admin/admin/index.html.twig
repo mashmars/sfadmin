@@ -4,7 +4,7 @@
  <!-- content -->
 <div class="grid-x padding-1 shadow">
     <div class="cell">
-        <a class="button hollow primary small" href="{{ path('admin.user.add') }}">
+        <a class="button hollow primary small" href="{{ path('admin.admin.add') }}">
             <i class="fas fa-plus"></i>
         添加</a>
         <a class="button info small float-right search">搜索</a>
@@ -33,7 +33,7 @@
                         <input type="text" id="" name="" placeholder="年份" value="">
                     </div>                                            
                     <div class="large-2 small-12 cell">
-                        <button type="button" class="button alert  hollow  margin-bottom-0 padding-tb" id="button-search"><i class="fas fa-search"></i> 查询</button>
+                        <button type="button" class="button alert hollow margin-bottom-0 padding-tb small" id="button-search"><i class="fas fa-search"></i> 查询</button>
                     </div>                                                                        
                 </div>                        
             </form>
@@ -54,33 +54,19 @@
         <div class="table-scroll">
             <table class="hover border gray">
                 <thead>
-                    <tr>
-                        <th class="text-center">ID</th>                                                                                
+                    <tr>                                                                             
                         <th class="text-center">用户名</th>   
                         <th class="text-center">角色</th> 
                         <th class="text-center">描述</th> 
+                        <th class="text-center">状态</th>
                         <th class="text-center">操作</th>
                     </tr>
                 </thead>
-                <tbody> 
-                    {% for v in pagination %}                                  
+                <tbody id="tbody">                         
                     <tr class="text-center">
-                        <td>{{ v.id }}</td>                                       
-                        <td>{{ v.username }}</td>                                                                                       
-                        <td>{{ v.role ? v.role.name : '' }}</td>       
-                        <td>{{ v.descript }}</td>                                 
-                        <td>
-                            <button class="hollow button small margin-bottom-0 padding-tb href-edit"  data-id="{{ v.id }}" data-href="{{ path('admin.user.edit', {'id':v.id}) }}">
-                                <i class="fas fa-edit"></i>
-                            编辑</button>
-                           
-                            <button class="hollow button small alert margin-bottom-0 padding-tb ajax-delete" data-id="{{ v.id }}" data-href="{{ path('admin.user.delete') }}">
-                                <i class="far fa-trash-alt"></i>
-                                删除</button>
-                            
-                        </td>
+                        
                     </tr>    
-                    {% endfor %}                                 
+                                                   
                 </tbody>
             </table>
         </div>
@@ -89,8 +75,59 @@
 </div>
 <!-- pagination -->
 <div class="grid-x margin-top-2 align-center">
-    {% if pagination %}{{ knp_pagination_render(pagination) }}{% endif %}
+    
 </div>
 <!-- pagination end -->
 <!-- content end -->
+{% endblock %}
+{% block extra %}
+<script>
+    const editURL = "/admin/admin/edit"
+    const deleteURL = baseURL + "/api/admin/delete"
+    const statusURL = baseURL + "/api/admin/status"
+    axiosInstance.get("/api/admin/index")
+        .then((response) => {
+            let data = response.data
+            if (data.code != 0) {
+                layer.msg(data.msg)
+            } else {
+                layer.load(2)
+                let tr = data.data.map((v) => {
+                   return `
+                        <tr class="text-center">
+                            <td>${v.username}</td>
+                            <td>${v.role_id}</td>
+                            <td>${v.descript}</td>
+                            <td>
+                                <div class="switch small">
+                                    <input class="switch-input" id="yes-no-${v.id}" type="checkbox" data-id="${v.id}" data-href="${statusURL}" ${v.is_enabled ? "checked" : ""}>
+                                    <label class="switch-paddle" for="yes-no-${v.id}">
+                                        <span class="show-for-sr">状态?</span>
+                                        <span class="switch-active" aria-hidden="true">启用</span>
+                                        <span class="switch-inactive" aria-hidden="true">禁用</span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td>
+                                <a class="hollow button small margin-bottom-0 padding-tb href-edit" href="${editURL}/${v.id}">
+                                        <i class="fas fa-edit"></i>
+                                    编辑</a>                           
+                                    <button class="hollow button small alert margin-bottom-0 padding-tb ajax-delete" data-title="是否确认删除？" data-id="${v.id}" data-href="${deleteURL}">
+                                        <i class="far fa-trash-alt"></i>
+                                        删除</button>
+                            </td>
+                        </tr>
+                    `
+                })                
+                //$("#tbody").html(tr.join(''))
+                document.querySelector("tbody").innerHTML = tr.join('')
+                layer.closeAll()
+            }
+        })
+        .catch((error) => {
+            console.log(error)
+        })
+    
+    
+</script>
 {% endblock %}

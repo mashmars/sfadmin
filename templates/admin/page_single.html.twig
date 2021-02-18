@@ -1,0 +1,56 @@
+<!doctype html>
+<html class="no-js" lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}单页面{% endblock %}</title>
+        <link rel="stylesheet" href="{{ asset('static/css/foundation.css') }}">
+        <link rel="stylesheet" href="{{ asset('static/css/app.css') }}">        
+    </head>
+    <body>
+    <!--main-->
+    <div class="grid-container">
+        <div class="grid-x margin-top-2">
+            <div class="cell">
+                {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                <div class="{{ label }} callout" data-closable> 
+                    <button class="close-button" aria-label="alert" type="button" data-close>
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <p>{{ message }}</p> 
+                </div> 
+                {% endfor %}
+                {% endfor %}
+               
+               <div class="cell">                                                          
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>        
+    </div>
+        
+
+    <script src="{{ asset('static/js/vendor/jquery.js') }}"></script>    
+    <script src="{{ asset('static/js/vendor/what-input.js') }}"></script>
+    <script src="{{ asset('static/js/vendor/foundation.js') }}"></script>
+    <script src="{{ asset('static/js/app.js') }}"></script>    
+    <script src="{{ asset('static/lib/layer/layer.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+        //
+        const baseURL = 'http://127.0.0.1:8080';
+        // 创建实例时设置配置的默认值
+        var axiosInstance = axios.create({
+            baseURL: baseURL,
+        
+        });
+        // 在实例已创建后修改默认值
+        axiosInstance.defaults.headers.common['Authorization'] = '';
+        axiosInstance.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+    </script>
+    {% block extra %}{% endblock %}
+    </body>
+</html>

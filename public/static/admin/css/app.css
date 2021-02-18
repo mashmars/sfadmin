@@ -164,5 +164,11 @@ table.border.gray tr,table.border.gray th,table.border.gray td{
     font-size: 1px;
 }
 
+table tr .switch {
+    margin-bottom: 0rem;
+}
+table tr .switch .switch-active,table tr .switch .switch-inactive {
+    top: 60%;
+}
 
 

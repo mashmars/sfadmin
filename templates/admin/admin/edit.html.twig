@@ -17,10 +17,24 @@
                         <div class="cell">                                                          
                             <form id="form" method="post" novalidate="novalidate">
                                <div>
-                                    <label for="name" class="required">角色名称</label>
-                                    <input type="text" id="name" name="name" required="required" value="">
+                                    <label for="name" class="required">用户名</label>
+                                    <input type="text" id="username" name="username" required="required" value="">
+                                </div>
+                                <div>
+                                    <label for="name" class="required">密码</label>
+                                    <input type="text" id="password" name="password" placeholder="为空不修改密码">
+                                </div>
+                                <div>
+                                    <label for="role_id" class="required">分配角色</label>
+                                    <select id="role_id" name="role_id">
+                                        <option value="">--请选择--</option>                                        
+                                    </select>
                                 </div>
                                 
+                                <div>
+                                    <label for="name" class="required">描述</label>
+                                    <textarea name="descript" id="descript"></textarea>
+                                </div>
                                 <div>
                                     <fieldset class="large-5 cell">
                                         <legend>状态</legend>
@@ -38,16 +52,36 @@
 {% block extra %}
 <script>
     const adminRolesURL = baseURL + "/api/admin/role/all"
-    const editURL = baseURL + "/api/admin/role/edit/{{ app.request.attributes.get('id') }}"
+    const editURL = baseURL + "/api/admin/edit/{{ app.request.attributes.get('id') }}"
     $(function() {
-       
+        //获取所有admin roles
+        axiosInstance.get(adminRolesURL)
+            .then((response) => {
+                let data = response.data
+                if (data.code != 0) {
+                    layer.msg(data.msg)
+                } else {
+                    layer.load(2)
+                    let option = data.data.map((v) => {
+                    return `
+                            <option value="${v.id}" ${v.id == 3 ? "selected" : ""}>${v.name}</option>
+                        `
+                    })                
+                    document.querySelector("#role_id").innerHTML = '<option value="">--请选择--</option>' + option.join('')
+                    layer.closeAll()
+                }
+            })  
+            .catch((error) => {
+                console.log(error)
+            }) 
         axiosInstance.get(editURL)
             .then((response) => {
                 let data = response.data
                 if (data.code != 0) {
                     layer.msg(data.msg)
                 } else {
-                    document.querySelector("#name").value = data.data.name
+                    document.querySelector("#username").value = data.data.username
+                    document.querySelector("#descript").value = data.data.descript
                     document.querySelectorAll("input[name=is_enabled]").forEach((node) => {
                         if (node.value == data.data.is_enabled) {
                             node.checked = true
@@ -61,8 +95,8 @@
                 console.log(error)
             })
         $('#submit').click(function() {
-            if ($('#name').val() == '') {
-                layer.msg('请先填写名称');
+            if ($('#username').val() == '') {
+                layer.msg('请先填写用户名');
                 return false;
             }
            
