@@ -83,9 +83,10 @@
 {% block extra %}
 <script>
     const editURL = "/admin/admin/edit"
+    const indexURL = baseURL + "/api/admin/index"
     const deleteURL = baseURL + "/api/admin/delete"
     const statusURL = baseURL + "/api/admin/status"
-    axiosInstance.get("/api/admin/index")
+    axiosInstance.get(indexURL)
         .then((response) => {
             let data = response.data
             if (data.code != 0) {

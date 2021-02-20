@@ -50,7 +50,7 @@ $('button.ajax-shenhe').on('click',function(){
 })
 
 /**layer open 打开iframe窗口 */
-$('.layer-open').click(function(){
+$('body').on('click', '.layer-open', function(){
     layer_open($(this).attr('data-title'),$(this).attr('data-href'));
 })
 $('.layer-open-return').click(function(){

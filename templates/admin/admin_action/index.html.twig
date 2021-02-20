@@ -1,0 +1,206 @@
+
+{% extends 'admin/base.html.twig' %}
+
+{% block main %}
+<div class="grid-x  padding-1 shadow">
+    <div class="cell">
+        <!--<a class="button hollow primary small" href="{{ path('admin.admin_action.add') }}">
+            <i class="fas fa-plus"></i>
+        新增</a>        -->
+        <a class="button info small float-right search">搜索</a>
+        <div id="search" class="clearfix">
+            <form action="" method="get" id="form-search">
+                <div class="grid-x grid-padding-x">                                       
+                    <div class="large-1 small-3 cell">
+                        <label for="" class="text-right middle">编号:</label>
+                    </div>
+                    <div class="large-2 small-9 cell">
+                        <input type="text" id="" name="" placeholder="" value="">
+                    </div> 
+                    <div class="large-1 small-3 cell">
+                        <label for="" class="text-right middle">下拉框:</label>
+                    </div>
+                    <div class="large-2 small-9 cell">
+                        <select name="" id="">
+                            <option value="">全部</option>                                                    
+                        </select>
+                    </div> 
+                    <div class="large-1 small-3 cell">
+                        <label for="" class="text-right middle">输入框:</label>
+                    </div>
+                    <div class="large-1 small-9 cell">
+                        <input type="text" id="" name="" placeholder="年份" value="">
+                    </div>                                            
+                    <div class="large-2 small-12 cell">
+                        <button type="button" class="button alert hollow margin-bottom-0 padding-tb small" id="button-search"><i class="fas fa-search"></i> 查询</button>
+                    </div>                                                                        
+                </div>                        
+            </form>
+        </div>  
+        <hr>
+        {% for label, messages in app.flashes %}
+        {% for message in messages %}
+        <div class="{{ label }} callout" data-closable> 
+            <button class="close-button" aria-label="alert" type="button" data-close>
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <p>{{ message }}</p> 
+        </div> 
+        {% endfor %}
+        {% endfor %}
+        <div class="grid-x grid-padding-x">                                       
+            <div class="large-1 small-4 cell">
+                <label for="start_date" class="text-right middle">选择菜单:</label>
+            </div>
+            <div class="large-2 small-8 cell">
+               <select id="menu">
+                <option value="">--请选择--</option>
+                
+               </select>               
+            </div>    
+            <div class="large-1 small-4 cell">
+                <button type="button" class="button warning  hollow  margin-bottom-0 padding-tb small" id="modify-action"><i class="fi-folder"></i> 设置菜单</button>               
+            </div>                                                                                
+            <div class="large-2 small-6 cell">                
+                <button class="button hollow success small check-action" type="button">
+                    <i class="fi-refresh"></i>
+                检查更新菜单功能</button>
+            </div>                                                                                
+        </div>     
+        <div class="table-scroll">
+            <table class="hover border gray">
+                <thead>
+                    <tr>
+                        <th class="text-center"><input type="checkbox" class="checkbox-ids" /></th>
+                        <th class="text-center">菜单名称</th>
+                        <th class="text-center">功能名称</th>
+                        <th class="text-center">路由全称</th>
+                        <th class="text-center">路由简称</th>
+                        <th class="text-center">是否子菜单</th>
+                        <th class="text-center">图标</th>
+                        <th class="text-center">排序</th>
+                        <th class="text-center">状态</th>
+                        <th class="text-center">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+                </tbody>
+            </table>
+        </div>      
+    </div>
+</div>
+<div class="grid-x margin-top-2 align-center">
+   
+</div>
+{% endblock %}
+{% block extra %}
+<script>
+$(function(){
+    const editURL = "/admin/action/edit"
+    const actionApiURL = "/admin/action/api"
+    const indexURL = baseURL + "/api/admin/action/index"
+    const deleteURL = baseURL + "/api/admin/action/delete"
+    const statusURL = baseURL + "/api/admin/action/status"
+    const setMenuURL = baseURL + "/api/admin/action/menu"
+    const menuURL = baseURL + "/api/admin/menu/all"
+    axiosInstance.get(indexURL)
+        .then((response) => {
+            let data = response.data
+            if (data.code != 0) {
+                layer.msg(data.msg)
+            } else {
+                layer.load(2)
+                let tr = data.data.map((v) => {
+                   return `
+                        <tr class="text-center">
+                            <td><input type="checkbox" class="checkbox-id" data-id="${v.id}"></td>
+                            <td>${v.menu_id}</td>
+                            <td>${v.name}</td>
+                            <td>${v.router_name}</td>
+                            <td>${v.router_short_name}</td>
+                            <td>${v.is_sub_menu ? "<label class='label success'>是</label>" : "<label class='label secondary'>否</label>"}</td>
+                            <td><i class="${v.icon}"></i></td>
+                            <td>${v.sorted_by}</td>
+                            <td>
+                                <div class="switch small">
+                                    <input class="switch-input" id="yes-no-${v.id}" type="checkbox" data-id="${v.id}" data-href="${statusURL}" ${v.is_enabled ? "checked" : ""}>
+                                    <label class="switch-paddle" for="yes-no-${v.id}">
+                                        <span class="show-for-sr">状态?</span>
+                                        <span class="switch-active" aria-hidden="true">启用</span>
+                                        <span class="switch-inactive" aria-hidden="true">禁用</span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td>
+                                <a class="hollow button small margin-bottom-0 padding-tb href-edit" href="${editURL}/${v.id}">
+                                    <i class="fas fa-edit"></i>
+                                    编辑</a>    
+                                <button class="hollow button small success margin-bottom-0 padding-tb layer-open" data-title="设置api" data-href="${actionApiURL}/${v.id}">
+                                    <i class="fi-eye"></i>
+                                    设置api</button>                        
+                                <button class="hollow button small alert margin-bottom-0 padding-tb ajax-delete" data-title="是否确认删除？" data-id="${v.id}" data-href="${deleteURL}">
+                                    <i class="far fa-trash-alt"></i>
+                                    删除</button>
+                            </td>
+                        </tr>
+                    `
+                })                
+                //$("#tbody").html(tr.join(''))
+                document.querySelector("tbody").innerHTML = tr.join('')
+                layer.closeAll()
+            }
+        })
+        .catch((error) => {
+            console.log(error)
+        })
+    
+    //获取所有admin menus
+    axiosInstance.get(menuURL)
+        .then((response) => {
+            let data = response.data
+            if (data.code != 0) {
+                layer.msg(data.msg)
+            } else {
+                layer.load(2)
+                let option = data.data.map((v) => {
+                return `
+                        <option value="${v.id}">${v.name}</option>
+                    `
+                })                
+                document.querySelector("#menu").innerHTML = '<option value="">--请选择--</option>' + option.join('')
+                layer.closeAll()
+            }
+        })  
+        .catch((error) => {
+            console.log(error)
+        })   
+        
+    $('#modify-action').click(function(){
+        var obj = $(this);
+        obj.prop('disabled', true);
+        var ids = new Array();
+        $('.checkbox-id').each(function(){
+            if ($(this).prop('checked')) {
+                ids.push($(this).attr('data-id'));
+            }
+        })
+        
+        var menu = $('#menu').val();
+        layer.load(2);
+        $.post(setMenuURL, {ids:ids, menu:menu}, function(data){
+            if(data.code == 0){
+                layer.msg(data.msg, {time:2000, icon:1},function(){
+                    location.reload();
+                })
+            }else{
+                layer.msg(data.msg, {time:2000, icon:5}, function(){
+                    layer.closeAll(); 
+                    obj.prop('disabled', false);
+                })
+            }           
+            
+        }, 'json')
+    })
+})
+</script>
+{% endblock %}

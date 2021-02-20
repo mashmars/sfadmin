@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class AdminRoleController extends BaseController
 {
     /**
-     * @Route("/role/index", name="admin_role.index", options={"name"="管理员角色首页"})
+     * @Route("/role/index", name="admin_role.index", options={"name"="管理员角色列表"})
      */
     public function index()
     {

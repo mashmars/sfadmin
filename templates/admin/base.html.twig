@@ -116,8 +116,8 @@
                                     <ul class="menu vertical nested">
                                         <li><a href="{{ path('admin.admin.index') }}" data-router="admin.admin"><i class="fi fi-record"></i>管理员管理</a></li>                                    
                                         <li><a href="{{ path('admin.admin_role.index') }}" data-router="admin.admin_role"><i class="fi fi-record"></i>角色管理</a></li>                                    
-                                        <li><a href="" data-router="admin.menu"><i class="fi fi-record"></i>菜单管理</a></li>                                    
-                                        <li><a href="" data-router="admin.action"><i class="fi fi-record"></i>菜单功能管理</a></li>                                    
+                                        <li><a href="{{ path('admin.admin_menu.index') }}" data-router="admin.admin_menu"><i class="fi fi-record"></i>菜单管理</a></li>                                    
+                                        <li><a href="{{ path('admin.admin_action.index') }}" data-router="admin.admin_action"><i class="fi fi-record"></i>菜单功能管理</a></li>                                    
                                     </ul>
                                 </li> 
                                               
@@ -220,16 +220,11 @@
     //
     $('.check-action').click(function(){  
         var obj = $(this);
-        var ids = new Array();
-        $('.checkbox-id').each(function(){
-            if ($(this).prop('checked')) {
-                ids.push($(this).attr('data-id'));
-            }
-        })
-        layer.confirm('是否确认更新选中的路由(路由配置将被注释路由或yaml路由替代)，默认只插入新的路由', {title:'更新控制器行为'}, function(){
+        
+        layer.confirm('是否确认更新路由', {title:'更新控制器行为'}, function(){
             obj.prop('disabled',true);
             layer.load(2);
-            $.post("",{ids:ids},function(data){
+            $.post("{{ path('admin.admin_action.check') }}",{},function(data){
                 if(data.code == 0){
                     layer.msg(data.msg, {time:2000,icon:1},function(){
                         location.reload();

@@ -1,0 +1,78 @@
+{% extends 'admin/page_single.html.twig' %}
+{% block content %}
+<div class="cell padding-1 shadow "> 
+    <div class="large-1 small-4 cell margin-1">
+        <button type="button" class="button warning  hollow  margin-bottom-0 padding-tb small" id="save"><i class="fi-folder"></i> 确认提交</button>               
+    </div>                          
+    <table class="hover border gray">
+        <thead>
+            <tr>
+                <th class="text-center"><input type="checkbox" class="checkbox-ids" /></th>
+                <th class="text-center">请求方法</th>
+                <th class="text-center">路径</th>
+                <th class="text-center">控制器行为</th>
+            </tr>
+        </thead>
+        <tbody id="tbody">
+            
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+{% block extra %}
+<script>
+const actionApiURL = baseURL + "/api/admin/action/api"
+const setApiActionURL = baseURL + "/api/admin/action/api/set"
+axiosInstance.get(actionApiURL)
+    .then((response) => {
+        let data = response.data
+        if (data.code != 0) {
+            layer.msg(data.msg)
+        } else {
+            layer.load(2)
+            let tr = data.data.map((v) => {
+                return `
+                    <tr class="text-center">
+                        <td><input type="checkbox" class="checkbox-id" data-id="${v.id}" ${v.action_id && v.action_id ==  "{{ app.request.attributes.get('id') }}" ? "checked" : (v.action_id && v.action_id != "{{ app.request.attributes.get('id') }}" ? "disabled" : "")}></td>
+                        <td>${v.method}</td>
+                        <td>${v.path}</td>
+                        <td>${v.controller_action}</td>
+                    </tr>
+                `
+            })                
+            //$("#tbody").html(tr.join(''))
+            document.querySelector("tbody").innerHTML = tr.join('')
+            layer.closeAll()
+        }
+    })
+    .catch((error) => {
+        console.log(error)
+    })
+
+$('#save').click(function(){
+        var obj = $(this);
+        obj.prop('disabled', true);
+        var ids = new Array();
+        $('.checkbox-id').each(function(){
+            if ($(this).prop('checked')) {
+                ids.push($(this).attr('data-id'));
+            }
+        })
+
+        layer.load(2);
+        $.post(setApiActionURL, {ids:ids, action_id:"{{ app.request.attributes.get('id') }}"}, function(data){
+            if(data.code == 0){
+                layer.msg(data.msg, {time:2000, icon:1},function(){
+                    location.reload();
+                })
+            }else{
+                layer.msg(data.msg, {time:2000, icon:5}, function(){
+                    layer.closeAll(); 
+                    obj.prop('disabled', false);
+                })
+            }           
+            
+        }, 'json')
+    })
+</script>
+{% endblock %}

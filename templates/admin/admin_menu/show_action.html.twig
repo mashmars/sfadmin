@@ -1,0 +1,46 @@
+{% extends 'admin/page_single.html.twig' %}
+{% block content %}
+<div class="cell padding-1 shadow ">                           
+    <table class="hover border gray">
+        <thead>
+            <tr>
+                <th class="text-center">路由名称</th>
+                <th class="text-center">路由标识</th>
+                <th class="text-center">路由短标识</th>
+            </tr>
+        </thead>
+        <tbody id="tbody">
+            
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+{% block extra %}
+<script>
+const menuActionURL = baseURL + "/api/admin/menu/action/{{ app.request.attributes.get('id') }}"
+axiosInstance.get(menuActionURL)
+    .then((response) => {
+        let data = response.data
+        if (data.code != 0) {
+            layer.msg(data.msg)
+        } else {
+            layer.load(2)
+            let tr = data.data.map((v) => {
+                return `
+                    <tr class="text-center">
+                        <td>${v.name}</td>
+                        <td>${v.router_name}</td>
+                        <td>${v.router_short_name}</td>
+                    </tr>
+                `
+            })                
+            //$("#tbody").html(tr.join(''))
+            document.querySelector("tbody").innerHTML = tr.join('')
+            layer.closeAll()
+        }
+    })
+    .catch((error) => {
+        console.log(error)
+    })
+</script>
+{% endblock %}

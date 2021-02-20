@@ -4,7 +4,7 @@
  <!-- content -->
 <div class="grid-x padding-1 shadow">
     <div class="cell">
-        <a class="button hollow primary small" href="{{ path('admin.admin_role.add') }}">
+        <a class="button hollow primary small" href="{{ path('admin.admin_menu.add') }}">
             <i class="fas fa-plus"></i>
         添加</a>
         <a class="button info small float-right search">搜索</a>
@@ -55,7 +55,10 @@
             <table class="hover border gray">
                 <thead>
                     <tr>                                  
-                        <th class="text-center">角色</th> 
+                        <th class="text-center">名称</th> 
+                        <th class="text-center">标识</th> 
+                        <th class="text-center">图标</th> 
+                        <th class="text-center">排序</th> 
                         <th class="text-center">状态</th>
                         <th class="text-center">操作</th>
                     </tr>
@@ -80,10 +83,11 @@
 {% endblock %}
 {% block extra %}
 <script>
-    const editURL = "/admin/role/edit"
-    const indexURL = baseURL + "/api/admin/role/index"
-    const deleteURL = baseURL + "/api/admin/role/delete"
-    const statusURL = baseURL + "/api/admin/role/status"
+    const editURL = "/admin/menu/edit"
+    const viewActionURL = "/admin/menu/action/show"
+    const indexURL = baseURL + "/api/admin/menu/index"
+    const deleteURL = baseURL + "/api/admin/menu/delete"
+    const statusURL = baseURL + "/api/admin/menu/status"
     axiosInstance.get(indexURL)
         .then((response) => {
             let data = response.data
@@ -95,6 +99,9 @@
                    return `
                         <tr class="text-center">
                             <td>${v.name}</td>
+                            <td>${v.sign}</td>
+                            <td><i class="${v.icon}"></i></td>
+                            <td>${v.sorted_by}</td>
                             <td>
                                 <div class="switch small">
                                     <input class="switch-input" id="yes-no-${v.id}" type="checkbox" data-id="${v.id}" data-href="${statusURL}" ${v.is_enabled ? "checked" : ""}>
@@ -108,10 +115,13 @@
                             <td>
                                 <a class="hollow button small margin-bottom-0 padding-tb href-edit" href="${editURL}/${v.id}">
                                         <i class="fas fa-edit"></i>
-                                    编辑</a>                           
-                                    <button class="hollow button small alert margin-bottom-0 padding-tb ajax-delete" data-title="是否确认删除？" data-id="${v.id}" data-href="${deleteURL}">
-                                        <i class="far fa-trash-alt"></i>
-                                        删除</button>
+                                    编辑</a>    
+                                <button class="hollow button small success margin-bottom-0 padding-tb layer-open" data-title="查看菜单功能" data-href="${viewActionURL}/${v.id}">
+                                    <i class="fi-eye"></i>
+                                查看功能</button>                       
+                                <button class="hollow button small alert margin-bottom-0 padding-tb ajax-delete" data-title="是否确认删除？" data-id="${v.id}" data-href="${deleteURL}">
+                                    <i class="far fa-trash-alt"></i>
+                                    删除</button>
                             </td>
                         </tr>
                     `

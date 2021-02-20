@@ -17,16 +17,30 @@
                         <div class="cell">                                                          
                             <form id="form" method="post" novalidate="novalidate">
                                <div>
-                                    <label for="name" class="required">角色名称</label>
+                                    <label for="name" class="required">名称</label>
                                     <input type="text" id="name" name="name" required="required">
+                                </div> 
+                                <div>
+                                    <label for="sign" class="required">菜单标识</label>
+                                    <input type="text" id="sign" name="sign" required="required">
+                                    <p class="help-text">唯一标识</p>
                                 </div>    
+                                <div>
+                                    <label for="icon" class="required">菜单图标</label>
+                                    <input type="text" id="icon" name="icon" required="required">
+                                </div> 
+                                <div>
+                                    <label for="sorted_by" class="required">排序</label>
+                                    <input type="text" id="sorted_by" name="sorted_by" required="required" value="100">
+                                    <p class="help-text">值越小越靠前</p>
+                                </div> 
                                 <div>
                                     <fieldset class="large-5 cell">
                                         <legend>状态</legend>
-                                        <input type="radio" name="is_enabled" value="1" id="is_enabled_1" checked><label for="is_enabled_1">启用</label>
+                                        <input type="radio" name="is_enabled" value="1" id="is_enabled_1"><label for="is_enabled_1">启用</label>
                                         <input type="radio" name="is_enabled" value="0" id="is_enabled_0"><label for="is_enabled_0">禁用</label>
                                     </fieldset>
-                                </div>                            
+                                </div>
                                 <div>
                                     <button type="button" id="submit" class="button small">提交</button>
                                 </div>
@@ -36,18 +50,42 @@
 {% endblock %}
 {% block extra %}
 <script>
-    const adminRolesURL = baseURL + "/api/admin/role/all"    
-    const addURL = baseURL + "/api/admin/role/add"
-
-    $(function() {  
+    const editURL = baseURL + "/api/admin/menu/edit/{{ app.request.attributes.get('id') }}"
+    $(function() {
        
+        axiosInstance.get(editURL)
+            .then((response) => {
+                let data = response.data
+                if (data.code != 0) {
+                    layer.msg(data.msg)
+                } else {
+                    document.querySelector("#name").value = data.data.name
+                    document.querySelector("#sign").value = data.data.sign
+                    document.querySelector("#icon").value = data.data.icon
+                    document.querySelector("#sorted_by").value = data.data.sorted_by
+                    document.querySelectorAll("input[name=is_enabled]").forEach((node) => {
+                        if (node.value == data.data.is_enabled) {
+                            node.checked = true
+                        } else {
+                            node.checked = false
+                        }
+                    })
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            })
         $('#submit').click(function() {
             if ($('#name').val() == '') {
                 layer.msg('请先填写名称');
                 return false;
             }
-            
-            axiosInstance.post(addURL, $("#form").serialize())
+            if ($('#sign').val() == '') {
+                layer.msg('请先填写标识');
+                return false;
+            }
+           
+            axiosInstance.post(editURL, $("#form").serialize())
                 .then((response) => {
                     let data = response.data
                     if (data.code == 1) {
@@ -56,7 +94,7 @@
                         })                        
                     } else {
                         layer.msg(data.msg, {time:2000, icon:1}, function() {
-                            location.href = "{{ path('admin.admin_role.index') }}"
+                            location.reload()
                         }) 
                     }
                 })

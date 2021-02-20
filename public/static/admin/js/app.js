@@ -111,7 +111,7 @@ $('body').on('change', '.switch-input', function() {
 })
 
 /**layer open 打开iframe窗口 */
-$('.layer-open').click(function(){ 
+$('body').on('click', '.layer-open', function(){ 
     if(!$(this).attr('data-href')) return false;
     layer_open($(this).attr('data-title'),$(this).attr('data-href'));
 })
@@ -126,7 +126,9 @@ $('.layer-open-return').click(function(){
 $('.checkbox-ids').click(function(){
     if($(this).prop('checked')){
         $('.checkbox-id').each(function(){
-            $(this).prop('checked', true);
+            if (!$(this).prop("disabled")) {
+                $(this).prop('checked', true);
+            }
         })
     }else{
         $('.checkbox-id').each(function(){
