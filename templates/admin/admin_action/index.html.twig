@@ -103,13 +103,11 @@ $(function(){
     const statusURL = baseURL + "/api/admin/action/status"
     const setMenuURL = baseURL + "/api/admin/action/menu"
     const menuURL = baseURL + "/api/admin/menu/all"
-    axiosInstance.get(indexURL)
-        .then((response) => {
-            let data = response.data
+    httpRequest('get', indexURL)
+        .then((data) => {
             if (data.code != 0) {
                 layer.msg(data.msg)
             } else {
-                layer.load(2)
                 let tr = data.data.map((v) => {
                    return `
                         <tr class="text-center">
@@ -155,9 +153,8 @@ $(function(){
         })
     
     //获取所有admin menus
-    axiosInstance.get(menuURL)
-        .then((response) => {
-            let data = response.data
+    httpRequest('get', menuURL)
+        .then((data) => {
             if (data.code != 0) {
                 layer.msg(data.msg)
             } else {

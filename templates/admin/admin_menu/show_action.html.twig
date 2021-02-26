@@ -18,9 +18,8 @@
 {% block extra %}
 <script>
 const menuActionURL = baseURL + "/api/admin/menu/action/{{ app.request.attributes.get('id') }}"
-axiosInstance.get(menuActionURL)
-    .then((response) => {
-        let data = response.data
+httpRequest('get', menuActionURL)
+    .then((data) => {
         if (data.code != 0) {
             layer.msg(data.msg)
         } else {

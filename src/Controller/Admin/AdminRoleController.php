@@ -34,4 +34,13 @@ class AdminRoleController extends BaseController
     {
         return $this->render("admin/admin_role/edit.html.twig");
     }
+
+    /**
+     * @Route("/role/auth/{id<\d+>}", name="admin_role.auth", options={"name"="管理员角色授权"})
+     */
+    public function auth()
+    {
+        return $this->render("admin/admin_role/auth.html.twig");
+    }
+
 }

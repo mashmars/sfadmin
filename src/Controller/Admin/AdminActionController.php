@@ -67,6 +67,7 @@ class AdminActionController extends BaseController
             $response = $httpClient->request('POST', $this->getParameter('api_action_collect'), [
                 'headers' => [
                     'Content-Type' => 'application/json',
+                    'Authorization' => $request->getSession()->get("token"),
                 ],
                 'json' => $routerEnabled,
             ]);

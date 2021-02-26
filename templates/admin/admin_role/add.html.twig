@@ -47,9 +47,8 @@
                 return false;
             }
             
-            axiosInstance.post(addURL, $("#form").serialize())
-                .then((response) => {
-                    let data = response.data
+            httpRequest('post', addURL, $("#form").serialize())
+                .then((data) => {
                     if (data.code == 1) {
                         layer.msg(data.msg, {time:2000, icon:5}, function() {
                             layer.closeAll()

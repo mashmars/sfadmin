@@ -18,9 +18,7 @@
                
                 <div class="cell">
                     <div class="alert callout" data-closable="slide-out-right">                   
-                        <p>1234</p>                   
-                        <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
-                        <span aria-hidden="true">&times;</span>
+                        <p>本后台系统view层是使用symfony搭建，没有使用react等前端js框架， go提供api服务， go使用jwt验证权限，symfony存储当前jwt管理登陆登出</p>   
                         </button>
                     </div>
                 </div>
@@ -65,6 +63,8 @@
     <script src="{{ asset('static/admin/js/app.js') }}"></script>
     <script src="{{ asset('static/lib/layer/layer.js') }}"></script>
     <script>
+    const baseURL = 'http://127.0.0.1:8080'
+    const loginURL = baseURL + '/api/admin/login';
     $("#login").click(function() {
         var username = $("#username").val();
         var password = $("#password").val();
@@ -76,11 +76,21 @@
         setTimeout(function() {
             layer.closeAll()
         }, 5000)
-        $.post("http://127.0.0.1:8080/api/admin/login", {username:username, password:password}, function(data) {
+        $.post(loginURL, {username:username, password:password}, function(data) {
             if (data.code == 0) {
-                layer.msg(data.msg, {time:2000, icon:1}, function() {
+                $.post("{{ path('admin.token') }}", {token:data.data.token, username:data.data.username}, function(data) {
+                    if (data.code == 0) {
+                        layer.msg(data.msg, {time:2000, icon:1}, function() {                            
+                            location.href = "{{ path('admin.index') }}"
+                        })
+                    } else {
+                        layer.msg(data.msg, {time:2000, icon:5})
+                    }
+                }, "json")
+                /*layer.msg(data.msg, {time:2000, icon:1}, function() {
+                    localStorage.setItem("token", data.data.token)
                     location.href = "{{ path('admin.index') }}"
-                })
+                })*/
             } else {
                 layer.msg(data.msg, {time:2000, icon:5})
             }

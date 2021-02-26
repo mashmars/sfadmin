@@ -53,9 +53,8 @@
     const editURL = baseURL + "/api/admin/menu/edit/{{ app.request.attributes.get('id') }}"
     $(function() {
        
-        axiosInstance.get(editURL)
-            .then((response) => {
-                let data = response.data
+        httpRequest('get', editURL)
+            .then((data) => {
                 if (data.code != 0) {
                     layer.msg(data.msg)
                 } else {
@@ -70,6 +69,7 @@
                             node.checked = false
                         }
                     })
+                    layer.closeAll()
                 }
             })
             .catch((error) => {
@@ -85,9 +85,8 @@
                 return false;
             }
            
-            axiosInstance.post(editURL, $("#form").serialize())
-                .then((response) => {
-                    let data = response.data
+            httpRequest('post', editURL, $("#form").serialize())
+                .then((data) => {
                     if (data.code == 1) {
                         layer.msg(data.msg, {time:2000, icon:5}, function() {
                             layer.closeAll()

@@ -23,9 +23,8 @@
 <script>
 const actionApiURL = baseURL + "/api/admin/action/api"
 const setApiActionURL = baseURL + "/api/admin/action/api/set"
-axiosInstance.get(actionApiURL)
-    .then((response) => {
-        let data = response.data
+httpRequest('get', actionApiURL)
+    .then((data) => {
         if (data.code != 0) {
             layer.msg(data.msg)
         } else {

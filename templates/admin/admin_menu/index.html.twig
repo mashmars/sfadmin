@@ -88,9 +88,8 @@
     const indexURL = baseURL + "/api/admin/menu/index"
     const deleteURL = baseURL + "/api/admin/menu/delete"
     const statusURL = baseURL + "/api/admin/menu/status"
-    axiosInstance.get(indexURL)
-        .then((response) => {
-            let data = response.data
+    httpRequest('get', indexURL)
+        .then((data) => {
             if (data.code != 0) {
                 layer.msg(data.msg)
             } else {

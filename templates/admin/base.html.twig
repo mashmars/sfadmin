@@ -36,7 +36,7 @@
                     <li class="is-action">
                         <a href="#" data-toggle="offCanvasLeft"><i class="fi-list-thumbnails"></i> </a>
                     </li>   
-                    <li class="menu-text">斯奎尔小白</li>                                                   
+                    <li class="menu-text">后台管理系统</li>                                                   
                 </ul>
             </div>            
         </div>        
@@ -59,7 +59,7 @@
                             </li>
                           
                             <li>
-                                <a href=""><i class="fi fi-power"></i>退出</a>
+                                <a class="ajax-shenhe" data-title="是否确定退出?" data-href="{{path('admin.logout')}}"><i class="fi fi-power"></i>退出</a>
                             </li> 
                             
                                                               
@@ -83,7 +83,7 @@
            <div class="hide-for-small-only right"  style="width:120px; z-index:101">                
                 <ul class="dropdown menu text-align" data-dropdown-menu="data-dropdown-menu">               
                     <li class="width-100">
-                        <a><img src="{{ asset('static/admin/img/avatar.png') }}" width="20" style="border-radius: 50%; "> adminnn</a>
+                        <a><img src="{{ asset('static/admin/img/avatar.png') }}" width="20" style="border-radius: 50%; "> {{ app.request.session.get("username" )}}</a>
                         <ul class="menu vertical">
                             
                             <li>
@@ -95,7 +95,7 @@
                             </li>
                            
                             <li>
-                                <a href=""><i class="fi fi-power"></i>退出</a>
+                                <a class="ajax-shenhe" data-title="是否确定退出?" data-href="{{path('admin.logout')}}"><i class="fi fi-power"></i>退出</a>
                             </li> 
                         </ul>
                     </li>                    
@@ -138,11 +138,11 @@
                             <div class="cell">                                
                                 <div class="callout callout-breadcrumbs" >
                                     <ul class="breadcrumbs">
-                                       <li><a href=""><i class="fas fa-home"></i> 后台首页</a></li>
-                                        <li><a href="">123</a></li>                                
+                                       <li><a href="{{ path('admin.index') }}"><i class="fas fa-home"></i> 后台首页</a></li>
+                                       <!-- <li><a href=""></a></li>                                
                                         <li>
-                                            <span class="show-for-sr">Current: </span> 123444
-                                        </li>
+                                            <span class="show-for-sr">Current: </span> 123
+                                        </li>-->
                                     </ul>
                                 </div>
                             </div>
@@ -248,7 +248,37 @@
 
     // 在实例已创建后修改默认值
     axiosInstance.defaults.headers.common['Authorization'] = '';
-     axiosInstance.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+    axiosInstance.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+
+    const httpRequest = async function(method, url, data='') {
+        return new Promise((resolve,reject)=>{
+            let token = localStorage.getItem("token")
+            let logout = ""
+            axios({
+                method: method,
+                url: url,
+                data: data,
+                headers: {'Authorization': "{{app.request.session.get('token')}}"}
+            }).then((response) => {
+                let data = response.data
+                if (data.code != 0) {
+                    if (data.code === 40001) {
+                        layer.msg(data.msg, {time:2000}, function() {
+                            location.href = "{{ path('admin.login') }}"
+                        })
+                    } else {
+                        layer.msg(data.msg)
+                    }
+                } else {
+                    layer.load(2)
+                    resolve(data);
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        })
+    }  
     </script> 
     {% endblock %}
     {% block extra %}{% endblock %}

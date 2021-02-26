@@ -1,87 +1,68 @@
 {% extends 'admin/base.html.twig' %}
 
 {% block main %}
-                    <div class="grid-x  padding-1 shadow">
-                        <div class="cell">
-                            {% for label, messages in app.flashes %}
-                            {% for message in messages %}
-                            <div class="{{ label }} callout" data-closable> 
-                                <button class="close-button" aria-label="alert" type="button" data-close>
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                                <p>{{ message }}</p>   
-                            </div>                      
-                            {% endfor %}   
-                            {% endfor %}  
-                        </div>
-                        <div class="cell">                                                          
-                            <form id="form" method="post" novalidate="novalidate">
-                               <div>
-                                    <label for="name" class="required">用户名</label>
-                                    <input type="text" id="username" name="username" required="required" value="">
-                                </div>
-                                <div>
-                                    <label for="name" class="required">密码</label>
-                                    <input type="text" id="password" name="password" placeholder="为空不修改密码">
-                                </div>
-                                <div>
-                                    <label for="role_id" class="required">分配角色</label>
-                                    <select id="role_id" name="role_id">
-                                        <option value="">--请选择--</option>                                        
-                                    </select>
-                                </div>
-                                
-                                <div>
-                                    <label for="name" class="required">描述</label>
-                                    <textarea name="descript" id="descript"></textarea>
-                                </div>
-                                <div>
-                                    <fieldset class="large-5 cell">
-                                        <legend>状态</legend>
-                                        <input type="radio" name="is_enabled" value="1" id="is_enabled_1"><label for="is_enabled_1">启用</label>
-                                        <input type="radio" name="is_enabled" value="0" id="is_enabled_0"><label for="is_enabled_0">禁用</label>
-                                    </fieldset>
-                                </div>
-                                <div>
-                                    <button type="button" id="submit" class="button small">提交</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+    <div class="grid-x  padding-1 shadow">
+        <div class="cell">
+            {% for label, messages in app.flashes %}
+            {% for message in messages %}
+            <div class="{{ label }} callout" data-closable> 
+                <button class="close-button" aria-label="alert" type="button" data-close>
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <p>{{ message }}</p>   
+            </div>                      
+            {% endfor %}   
+            {% endfor %}  
+        </div>
+        <div class="cell">                                                          
+            <form id="form" method="post" novalidate="novalidate">
+                <div>
+                    <label for="name" class="required">用户名</label>
+                    <input type="text" id="username" name="username" required="required" value="">
+                </div>
+                <div>
+                    <label for="name" class="required">密码</label>
+                    <input type="text" id="password" name="password" placeholder="为空不修改密码">
+                </div>
+                <div>
+                    <label for="role_id" class="required">分配角色</label>
+                    <select id="role_id" name="role_id" data-id="">
+                        <option value="">--请选择--</option>                                        
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="name" class="required">描述</label>
+                    <textarea name="descript" id="descript"></textarea>
+                </div>
+                <div>
+                    <fieldset class="large-5 cell">
+                        <legend>状态</legend>
+                        <input type="radio" name="is_enabled" value="1" id="is_enabled_1"><label for="is_enabled_1">启用</label>
+                        <input type="radio" name="is_enabled" value="0" id="is_enabled_0"><label for="is_enabled_0">禁用</label>
+                    </fieldset>
+                </div>
+                <div>
+                    <button type="button" id="submit" class="button small">提交</button>
+                </div>
+            </form>
+        </div>
+    </div>
 {% endblock %}
 {% block extra %}
 <script>
     const adminRolesURL = baseURL + "/api/admin/role/all"
     const editURL = baseURL + "/api/admin/edit/{{ app.request.attributes.get('id') }}"
     $(function() {
-        //获取所有admin roles
-        axiosInstance.get(adminRolesURL)
-            .then((response) => {
-                let data = response.data
+        httpRequest('get', editURL)
+            .then((data) => {
                 if (data.code != 0) {
                     layer.msg(data.msg)
                 } else {
-                    layer.load(2)
-                    let option = data.data.map((v) => {
-                    return `
-                            <option value="${v.id}" ${v.id == 3 ? "selected" : ""}>${v.name}</option>
-                        `
-                    })                
-                    document.querySelector("#role_id").innerHTML = '<option value="">--请选择--</option>' + option.join('')
-                    layer.closeAll()
-                }
-            })  
-            .catch((error) => {
-                console.log(error)
-            }) 
-        axiosInstance.get(editURL)
-            .then((response) => {
-                let data = response.data
-                if (data.code != 0) {
-                    layer.msg(data.msg)
-                } else {
+                    originData = data.data
                     document.querySelector("#username").value = data.data.username
                     document.querySelector("#descript").value = data.data.descript
+                    document.querySelector("#role_id").attributes["data-id"].nodeValue = data.data.role_id
                     document.querySelectorAll("input[name=is_enabled]").forEach((node) => {
                         if (node.value == data.data.is_enabled) {
                             node.checked = true
@@ -89,20 +70,43 @@
                             node.checked = false
                         }
                     })
+
+                    //获取所有admin roles
+                    httpRequest('get', adminRolesURL)
+                        .then((data) => {
+                            if (data.code != 0) {
+                                layer.msg(data.msg)
+                            } else {
+                                layer.load(2)
+                                let option = data.data.map((v) => {
+                                return `
+                                        <option value="${v.id}" ${v.id == document.querySelector("#role_id").attributes["data-id"].nodeValue ? "selected" : ""}>${v.name}</option>
+                                    `
+                                })                
+                                document.querySelector("#role_id").innerHTML = '<option value="">--请选择--</option>' + option.join('')
+                                layer.closeAll()
+                            }
+                        })  
+                        .catch((error) => {
+                            console.log(error)
+                        }) 
+
+                    layer.closeAll()
                 }
             })
             .catch((error) => {
                 console.log(error)
             })
+        
+        
         $('#submit').click(function() {
             if ($('#username').val() == '') {
                 layer.msg('请先填写用户名');
                 return false;
             }
            
-            axiosInstance.post(editURL, $("#form").serialize())
-                .then((response) => {
-                    let data = response.data
+            httpRequest('post', editURL, $("#form").serialize())
+                .then((data) => {
                     if (data.code == 1) {
                         layer.msg(data.msg, {time:2000, icon:5}, function() {
                             layer.closeAll()

@@ -47,28 +47,18 @@
 <script>
     const adminRolesURL = baseURL + "/api/admin/role/all"
     const addURL = baseURL + "/api/admin/add"
-
+    
     $(function() {  
         //获取所有admin roles
-        axiosInstance.get(adminRolesURL)
-            .then((response) => {
-                let data = response.data
-                if (data.code != 0) {
-                    layer.msg(data.msg)
-                } else {
-                    layer.load(2)
-                    let option = data.data.map((v) => {
-                    return `
-                            <option value="${v.id}">${v.name}</option>
-                        `
-                    })                
-                    document.querySelector("#role_id").innerHTML = '<option value="">--请选择--</option>' + option.join('')
-                    layer.closeAll()
-                }
-            })  
-            .catch((error) => {
-                console.log(error)
-            })   
+        httpRequest('get', adminRolesURL).then((data)=> {
+            let option = data.data.map((v) => {
+            return `
+                    <option value="${v.id}">${v.name}</option>
+                `
+            })                
+            document.querySelector("#role_id").innerHTML = '<option value="">--请选择--</option>' + option.join('')
+            layer.closeAll()
+        })
         $('#submit').click(function() {
             if ($('#username').val() == '') {
                 layer.msg('请先填写用户名');
@@ -77,11 +67,9 @@
             if ($('#password').val() == '') {
                 layer.msg('请先填写登陆密码');
                 return false;
-            }
-           
-            axiosInstance.post(addURL, $("#form").serialize())
-                .then((response) => {
-                    let data = response.data
+            }           
+            httpRequest('post', addURL, $("#form").serialize())
+                .then((data) => {                   
                     if (data.code == 1) {
                         layer.msg(data.msg, {time:2000, icon:5}, function() {
                             layer.closeAll()

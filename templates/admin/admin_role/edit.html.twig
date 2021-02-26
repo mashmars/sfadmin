@@ -1,49 +1,47 @@
 {% extends 'admin/base.html.twig' %}
 
 {% block main %}
-                    <div class="grid-x  padding-1 shadow">
-                        <div class="cell">
-                            {% for label, messages in app.flashes %}
-                            {% for message in messages %}
-                            <div class="{{ label }} callout" data-closable> 
-                                <button class="close-button" aria-label="alert" type="button" data-close>
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                                <p>{{ message }}</p>   
-                            </div>                      
-                            {% endfor %}   
-                            {% endfor %}  
-                        </div>
-                        <div class="cell">                                                          
-                            <form id="form" method="post" novalidate="novalidate">
-                               <div>
-                                    <label for="name" class="required">角色名称</label>
-                                    <input type="text" id="name" name="name" required="required" value="">
-                                </div>
-                                
-                                <div>
-                                    <fieldset class="large-5 cell">
-                                        <legend>状态</legend>
-                                        <input type="radio" name="is_enabled" value="1" id="is_enabled_1"><label for="is_enabled_1">启用</label>
-                                        <input type="radio" name="is_enabled" value="0" id="is_enabled_0"><label for="is_enabled_0">禁用</label>
-                                    </fieldset>
-                                </div>
-                                <div>
-                                    <button type="button" id="submit" class="button small">提交</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+<div class="grid-x  padding-1 shadow">
+    <div class="cell">
+        {% for label, messages in app.flashes %}
+        {% for message in messages %}
+        <div class="{{ label }} callout" data-closable> 
+            <button class="close-button" aria-label="alert" type="button" data-close>
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <p>{{ message }}</p>   
+        </div>                      
+        {% endfor %}   
+        {% endfor %}  
+    </div>
+    <div class="cell">                                                          
+        <form id="form" method="post" novalidate="novalidate">
+            <div>
+                <label for="name" class="required">角色名称</label>
+                <input type="text" id="name" name="name" required="required" value="">
+            </div>
+            
+            <div>
+                <fieldset class="large-5 cell">
+                    <legend>状态</legend>
+                    <input type="radio" name="is_enabled" value="1" id="is_enabled_1"><label for="is_enabled_1">启用</label>
+                    <input type="radio" name="is_enabled" value="0" id="is_enabled_0"><label for="is_enabled_0">禁用</label>
+                </fieldset>
+            </div>
+            <div>
+                <button type="button" id="submit" class="button small">提交</button>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
 {% block extra %}
 <script>
     const adminRolesURL = baseURL + "/api/admin/role/all"
     const editURL = baseURL + "/api/admin/role/edit/{{ app.request.attributes.get('id') }}"
-    $(function() {
-       
-        axiosInstance.get(editURL)
-            .then((response) => {
-                let data = response.data
+    $(function() {       
+        httpRequest('get', editURL)
+            .then((data) => {
                 if (data.code != 0) {
                     layer.msg(data.msg)
                 } else {
@@ -55,6 +53,7 @@
                             node.checked = false
                         }
                     })
+                    layer.closeAll()
                 }
             })
             .catch((error) => {
@@ -66,9 +65,8 @@
                 return false;
             }
            
-            axiosInstance.post(editURL, $("#form").serialize())
-                .then((response) => {
-                    let data = response.data
+            httpRequest('post', editURL, $("#form").serialize())
+                .then((data) => {
                     if (data.code == 1) {
                         layer.msg(data.msg, {time:2000, icon:5}, function() {
                             layer.closeAll()

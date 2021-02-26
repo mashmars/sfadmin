@@ -86,49 +86,38 @@
     const indexURL = baseURL + "/api/admin/index"
     const deleteURL = baseURL + "/api/admin/delete"
     const statusURL = baseURL + "/api/admin/status"
-    axiosInstance.get(indexURL)
-        .then((response) => {
-            let data = response.data
-            if (data.code != 0) {
-                layer.msg(data.msg)
-            } else {
-                layer.load(2)
-                let tr = data.data.map((v) => {
-                   return `
-                        <tr class="text-center">
-                            <td>${v.username}</td>
-                            <td>${v.role_id}</td>
-                            <td>${v.descript}</td>
-                            <td>
-                                <div class="switch small">
-                                    <input class="switch-input" id="yes-no-${v.id}" type="checkbox" data-id="${v.id}" data-href="${statusURL}" ${v.is_enabled ? "checked" : ""}>
-                                    <label class="switch-paddle" for="yes-no-${v.id}">
-                                        <span class="show-for-sr">状态?</span>
-                                        <span class="switch-active" aria-hidden="true">启用</span>
-                                        <span class="switch-inactive" aria-hidden="true">禁用</span>
-                                    </label>
-                                </div>
-                            </td>
-                            <td>
-                                <a class="hollow button small margin-bottom-0 padding-tb href-edit" href="${editURL}/${v.id}">
-                                        <i class="fas fa-edit"></i>
-                                    编辑</a>                           
-                                    <button class="hollow button small alert margin-bottom-0 padding-tb ajax-delete" data-title="是否确认删除？" data-id="${v.id}" data-href="${deleteURL}">
-                                        <i class="far fa-trash-alt"></i>
-                                        删除</button>
-                            </td>
-                        </tr>
-                    `
-                })                
-                //$("#tbody").html(tr.join(''))
-                document.querySelector("tbody").innerHTML = tr.join('')
-                layer.closeAll()
-            }
-        })
-        .catch((error) => {
-            console.log(error)
-        })
-    
-    
+    httpRequest('get', indexURL)
+        .then((data) => {
+            let tr = data.data.map((v) => {
+                return `
+                    <tr class="text-center">
+                        <td>${v.username}</td>
+                        <td>${v.role_id}</td>
+                        <td>${v.descript}</td>
+                        <td>
+                            <div class="switch small">
+                                <input class="switch-input" id="yes-no-${v.id}" type="checkbox" data-id="${v.id}" data-href="${statusURL}" ${v.is_enabled ? "checked" : ""}>
+                                <label class="switch-paddle" for="yes-no-${v.id}">
+                                    <span class="show-for-sr">状态?</span>
+                                    <span class="switch-active" aria-hidden="true">启用</span>
+                                    <span class="switch-inactive" aria-hidden="true">禁用</span>
+                                </label>
+                            </div>
+                        </td>
+                        <td>
+                            <a class="hollow button small margin-bottom-0 padding-tb href-edit" href="${editURL}/${v.id}">
+                                    <i class="fas fa-edit"></i>
+                                编辑</a>                           
+                                <button class="hollow button small alert margin-bottom-0 padding-tb ajax-delete" data-title="是否确认删除？" data-id="${v.id}" data-href="${deleteURL}">
+                                    <i class="far fa-trash-alt"></i>
+                                    删除</button>
+                        </td>
+                    </tr>
+                `
+            })                
+            //$("#tbody").html(tr.join(''))
+            document.querySelector("tbody").innerHTML = tr.join('')
+            layer.closeAll()
+        })    
 </script>
 {% endblock %}
